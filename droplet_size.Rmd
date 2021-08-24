@@ -1,0 +1,164 @@
+---
+title: "droplet_size"
+author: "Maxwel Coura Oliveira"
+date: "8/24/2021"
+output: html_document
+---
+
+
+```{r}
+#load packages
+library(tidyverse)
+library(emmeans)
+library(brms)
+library(bayestestR)
+library(modelbased)
+library(ggtext)
+library(patchwork)
+library(ggrepel)
+library(ggthemes)
+```
+
+
+```{r}
+#import dataset
+readxl::read_excel("data/droplet_size_data.xlsx") %>% 
+  janitor::clean_names() %>% 
+  mutate(solution = str_replace_all(solution, "Intact", "DRA")) %>% 
+  group_by(solution, nozzle) %>% 
+  mutate(nozzle = str_remove_all(nozzle, '[0-9]+')) %>% 
+  mutate(x200 = x200/100) %>% 
+  mutate(rep = row_number()) -> droplet
+```
+
+
+
+ 
+
+```{r message = FALSE}
+#dv10 model
+model13 <- brm(`dv10` ~ solution * nozzle,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+
+
+```{r}
+#dv10 comparison
+dv10_main <- pairs(emmeans(model13, ~ solution * nozzle))
+
+describe_posterior(dv10_main,
+                   centrality = "mean", dispersion = TRUE,
+                   ci = .95, ci_method = "hdi",
+                   test = c("bayesfactor"),
+                   bf_prior = model13)
+```
+
+
+
+
+
+```{r}
+#dv50 model
+model23 <- brm(`dv50` ~ solution * nozzle,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+```{r}
+#dv50 comparison
+dv50_main <- pairs(emmeans(model23, ~ nozzle * solution))
+
+describe_posterior(dv50_main,
+                   centrality = "mean", dispersion = TRUE,
+                   ci = .95, ci_method = "hdi",
+                   test = c("bayesfactor"),
+                   bf_prior = model23)
+```
+
+
+
+
+
+```{r}
+#dv90 model
+model33 <- brm(`dv90` ~ solution * nozzle,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+
+```{r}
+#dv90 comparison
+dv90_main <- pairs(emmeans(model33, ~ nozzle * solution))
+
+describe_posterior(dv90_main,
+                   centrality = "mean", dispersion = TRUE,
+                   ci = .95, ci_method = "hdi",
+                   test = c("bayesfactor"),
+                   bf_prior = model33)
+```
+
+
+
+```{r}
+#relative spam
+model43 <- brm(rs ~ solution * nozzle,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.1, 0.5, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+
+
+```{r}
+#relative spam comparison
+rs_main <- pairs(emmeans(model43, ~ nozzle * solution))
+
+describe_posterior(rs_main,
+                   centrality = "mean", dispersion = TRUE,
+                   ci = .95, ci_method = "hdi",
+                   test = c("bayesfactor"),
+                   bf_prior = model43)
+```
+
+
+
+
+```{r}
+# drifable fines
+model53 <- brm(`x200` ~ solution * nozzle,
+                  family = Beta(link = "logit", link_phi = "log"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.1, 0.5, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+
+```{r}
+# drifable fines comparison
+duz_main <- pairs(emmeans(model53, ~ nozzle * solution))
+
+describe_posterior(duz_main,
+                   centrality = "mean", dispersion = TRUE,
+                   ci = .95, ci_method = "hdi",
+                   test = c("bayesfactor"),
+                   bf_prior = model53)
+```
+
