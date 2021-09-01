@@ -37,6 +37,15 @@ readxl::read_excel("data/droplet_size_data.xlsx") %>%
 
 ```{r message = FALSE}
 #dv10 model
+model12 <- brm(`dv10` ~ solution ,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+
+
 model13 <- brm(`dv10` ~ solution * nozzle,
                   family = hurdle_gamma(link = "log", 
                                         link_shape = "log", 
@@ -46,11 +55,15 @@ model13 <- brm(`dv10` ~ solution * nozzle,
                   data = droplet, save_pars = save_pars(all = TRUE))
 ```
 
+```{r warning = FALSE, message = FALSE}
+bayesfactor_models(model13, denominator = model12)
+# There are extreme evidence for model13 (interaction)
+```
 
 
 ```{r}
 #dv10 comparison
-dv10_main <- pairs(emmeans(model13, ~ solution * nozzle))
+dv10_main <- pairs(emmeans(model13, ~ nozzle * solution))
 
 describe_posterior(dv10_main,
                    centrality = "mean", dispersion = TRUE,
@@ -66,8 +79,19 @@ emmeans1 <- emmeans(model13, ~ nozzle * solution,
 ```
 
 
+
+
 ```{r}
 #dv50 model
+model22 <- brm(`dv50` ~ solution,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+
+
 model23 <- brm(`dv50` ~ solution * nozzle,
                   family = hurdle_gamma(link = "log", 
                                         link_shape = "log", 
@@ -76,6 +100,12 @@ model23 <- brm(`dv50` ~ solution * nozzle,
                prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
                   data = droplet, save_pars = save_pars(all = TRUE))
 ```
+
+```{r}
+bayesfactor_models(model23, denominator = model22)
+# There are extreme evidence for model23 (interaction)
+```
+
 
 ```{r}
 emmeans2 <- emmeans(model23, ~ nozzle * solution, cont="pairwise", type = "response")
@@ -99,6 +129,15 @@ describe_posterior(dv50_main,
 
 ```{r}
 #dv90 model
+model32 <- brm(`dv90` ~ solution,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.5, 1, 2)", class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+
+
 model33 <- brm(`dv90` ~ solution * nozzle,
                   family = hurdle_gamma(link = "log", 
                                         link_shape = "log", 
@@ -108,6 +147,11 @@ model33 <- brm(`dv90` ~ solution * nozzle,
                   data = droplet, save_pars = save_pars(all = TRUE))
 ```
 
+
+```{r}
+bayesfactor_models(model33, denominator = model32)
+# There are extreme evidence for model33 (interaction)
+```
 
 ```{r}
 emmeans3 <- emmeans(model33, ~ nozzle * solution, cont="pairwise", type = "response")
@@ -128,13 +172,29 @@ describe_posterior(dv90_main,
 
 ```{r}
 #relative spam
+model42 <- brm(rs ~ solution,
+                  family = hurdle_gamma(link = "log", 
+                                        link_shape = "log", 
+                                        link_hu = "logit"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.1, 0.5, 2)", 
+                                 class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+
+
 model43 <- brm(rs ~ solution * nozzle,
                   family = hurdle_gamma(link = "log", 
                                         link_shape = "log", 
                                         link_hu = "logit"),
                warmup = 1000, iter = 2000, chains = 4,
-               prior = set_prior("student_t(0.1, 0.5, 2)", class = "b"),
+               prior = set_prior("student_t(0.1, 0.5, 2)", 
+                                 class = "b"),
                   data = droplet, save_pars = save_pars(all = TRUE))
+```
+
+```{r}
+bayesfactor_models(model43, denominator = model42)
+# There are extreme evidence for model43 (interaction)
 ```
 
 ```{r}
@@ -157,13 +217,26 @@ describe_posterior(rs_main,
 
 ```{r}
 # drifable fines
+model52 <- brm(`x200` ~ solution,
+                  family = Beta(link = "logit", link_phi = "log"),
+               warmup = 1000, iter = 2000, chains = 4,
+               prior = set_prior("student_t(0.1, 0.5, 2)", 
+                                 class = "b"),
+                  data = droplet, save_pars = save_pars(all = TRUE))
+
+
 model53 <- brm(`x200` ~ solution * nozzle,
                   family = Beta(link = "logit", link_phi = "log"),
                warmup = 1000, iter = 2000, chains = 4,
-               prior = set_prior("student_t(0.1, 0.5, 2)", class = "b"),
+               prior = set_prior("student_t(0.1, 0.5, 2)", 
+                                 class = "b"),
                   data = droplet, save_pars = save_pars(all = TRUE))
 ```
 
+```{r}
+bayesfactor_models(model53, denominator = model52)
+# There are extreme evidence for model53 (interaction)
+```
 
 ```{r}
 emmeans5 <- emmeans(model53, ~ nozzle * solution, cont= "pairwise", type = "response")
