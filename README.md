@@ -2,3 +2,6 @@
 
 # bayes_hooded
 Data analysis of manuscript
+
+# Cite as
+Maxwel C Oliveira. (2021). maxwelco/bayes_hooded: First release (v1.0). Zenodo. https://doi.org/10.5281/zenodo.5363478
