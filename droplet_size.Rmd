@@ -17,6 +17,9 @@ library(ggtext)
 library(patchwork)
 library(ggrepel)
 library(ggthemes)
+library(extrafont)
+library(showtext)
+showtext_auto()
 ```
 
 
@@ -194,7 +197,7 @@ model43 <- brm(rs ~ solution * nozzle,
 
 ```{r}
 bayesfactor_models(model43, denominator = model42)
-# There are extreme evidence for model43 (interaction)
+# There are extreme evidence for model42 (no interaction). We are going to present with interaction to keep all trt the same.
 ```
 
 ```{r}
@@ -336,7 +339,6 @@ emm %>%
         axis.title = element_markdown(size = 30),
         axis.text = element_markdown(size = 25)) +
   guides(color = "none") -> fig1
-
 ```
 
                 
@@ -452,5 +454,5 @@ fig1 + fig2 + fig3 +
   plot_annotation(tag_levels = 'A') & 
   theme(plot.tag = element_text(size = 35, hjust = 0, vjust = 0))
 
-ggsave("Figure 5.png", width = 11, height = 4)
+ggsave("figures/Figure 1.png", width = 11, height = 4)
 ```
