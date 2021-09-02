@@ -88,7 +88,16 @@ describe_posterior(inswath_main,
 ```{r}
 epred$emmeans %>% as_tibble() %>% 
   mutate(sprayer = if_else(str_detect(trt, "Open"), "Open", "Hood")) %>% 
-  mutate(emmean = round(emmean, 1)) %>% 
+  mutate(emmean = round(emmean, 1)) %>%
+  mutate(trt = fct_relevel(trt, levels = c("DRA-Hood-AIXR", "DRA-Hood-ULD", "DRA-Hood-TTI",
+                                            "DRA-Open-AIXR", "DRA-Open-ULD", "DRA-Open-TTI",
+                                            "Hood-AIXR", "Hood-ULD", "Hood-TTI",
+                                            "Open-AIXR", "Open-ULD", "Open-TTI"))) -> inswath_fig
+```
+
+
+```{r}
+inswath_fig %>% 
   ggplot(aes(x = fct_reorder(trt, emmean), y = emmean,
              color = trt, shape = sprayer, label = emmean)) +
   geom_point(size = 3) +
@@ -296,10 +305,6 @@ ggsave("figures/Figure 3.png", width = 6, height = 9)
 ```
 
 
-```{r include=TRUE}
-
-
-```
 
 ### AUC
 
@@ -374,7 +379,16 @@ describe_posterior(auc_main,
 epred3$emmeans %>% as_tibble() %>% 
   mutate(sprayer = if_else(str_detect(trt, "Open"), "Open", "Hood")) %>% 
   mutate(emmean = round(emmean, 1)) %>% 
-  ggplot(aes(x = fct_reorder(trt, emmean), y = emmean,
+  mutate(trt = fct_relevel(trt, levels = c("DRA-Hood-AIXR", "DRA-Hood-ULD", "DRA-Hood-TTI",
+                                            "DRA-Open-AIXR", "DRA-Open-ULD", "DRA-Open-TTI",
+                                            "Hood-AIXR", "Hood-ULD", "Hood-TTI",
+                                            "Open-AIXR", "Open-ULD", "Open-TTI"))) -> auc_fig
+```
+
+
+```{r}
+auc_fig %>% 
+ggplot(aes(x = fct_reorder(trt, emmean), y = emmean,
              color = trt, shape = sprayer, label = emmean)) +
   geom_point(size = 3) +
   geom_jitter(data = auc_data %>% 
