@@ -12,6 +12,8 @@ library(rstanarm)
 library(brms)
 library(scales)
 library(tidyverse)
+library(bayestestR)
+library(BayesFactor)
 library(emmeans)
 library(ggthemes)
 library(ggpmisc)
@@ -213,7 +215,11 @@ fig1 %>%
 
 
 ```{r}
-label <- distance_final %>% 
+label <- params %>% 
+  pivot_wider(id_cols = trt,
+              names_from = "term", 
+              values_from = "estimate") %>% 
+  mutate(slope = - slope) %>% 
   mutate(Intercept = round(Intercept, 1),
          slope = round(slope, 2)) %>% 
   mutate(y = "y = ",
@@ -237,7 +243,24 @@ loc <- tibble(trt = "DRA-Open-TTI")
 ```{r include=TRUE}
 fig2 %>% 
   mutate(trt = str_replace(trt, "Intact", "DRA")) %>% 
-  mutate(hood = if_else(str_detect(trt, "Open"), "Open", "Hood")) %>% 
+  mutate(hood = if_else(str_detect(trt, "Open"), "Open", "Hood")) -> fig3
+```
+
+
+```{r include=TRUE}
+fig3 %>% 
+  ungroup() %>% 
+  mutate(trt = fct_relevel(trt, levels = c("DRA-Hood-AIXR", "DRA-Hood-ULD", "DRA-Hood-TTI",
+                                            "DRA-Open-AIXR", "DRA-Open-ULD", "DRA-Open-TTI",
+                                            "Hood-AIXR", "Hood-ULD", "Hood-TTI",
+                                            "Open-AIXR", "Open-ULD", "Open-TTI"))) -> fig4
+```
+
+
+
+
+```{r include=TRUE}
+fig4 %>% 
   ggplot(aes(x = distance_m, y = predicted, color = trt, 
              fill = trt, label = formula, shape = hood)) +
   scale_color_viridis_d(option = "H") + 
@@ -249,21 +272,7 @@ fig2 %>%
   facet_wrap(~ trt, ncol = 3) +
   scale_shape_manual(values = c(16, 1)) + 
   theme_few() +
-#  geom_text(data = loc, mapping = aes(x = 10, y = 20), 
-#            label = "Intercept", inherit.aes = FALSE, size = 10) +
-#  geom_text(data = loc, mapping = aes(x = 55, y = 10), 
-##            label = "Slope", inherit.aes = FALSE, size = 10) +
   geom_label(aes(label = formula), x = 30, y = 15, color = "white", size = 12) +
-#  geom_curve(data = loc, mapping = aes(x = 25, y = 17,
-#             xend = 20, yend = 20),
-#             arrow = arrow(length = unit(0.07, "inch")), 
-#             color = 1,
-#             size = 0.4, curvature = 0.3, inherit.aes = FALSE) +
-#  geom_curve(data = loc, mapping = aes(x = 42, y = 13,
-#             xend = 47, yend = 10),
-#             arrow = arrow(length = unit(0.07, "inch")), 
-#             color = 1,
-#             size = 0.4, curvature = 0.3, inherit.aes = FALSE) +
   labs(x = "Distance (m)", 
        y = expression(paste("Spray particle deposition (\u03b7L/cm"^"2",")"))) +
   theme(legend.position = "none",
@@ -284,6 +293,12 @@ fig2 %>%
 
 
 ggsave("figures/Figure 3.png", width = 6, height = 9)
+```
+
+
+```{r include=TRUE}
+
+
 ```
 
 ### AUC
