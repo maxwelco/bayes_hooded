@@ -2,9 +2,16 @@
 title: "droplet_size"
 author: "Maxwel Coura Oliveira"
 date: "8/24/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
 
 ```{r}
 #load packages
@@ -58,6 +65,7 @@ model13 <- brm(`dv10` ~ solution * nozzle,
                   data = droplet, save_pars = save_pars(all = TRUE))
 ```
 
+
 ```{r warning = FALSE, message = FALSE}
 bayesfactor_models(model13, denominator = model12)
 # There are extreme evidence for model13 (interaction)
@@ -69,7 +77,7 @@ bayesfactor_models(model13, denominator = model12)
 dv10_main <- pairs(emmeans(model13, ~ nozzle * solution))
 
 describe_posterior(dv10_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model13)
@@ -120,7 +128,7 @@ emmeans2 <- emmeans(model23, ~ nozzle * solution, cont="pairwise", type = "respo
 dv50_main <- pairs(emmeans(model23, ~ nozzle * solution))
 
 describe_posterior(dv50_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model23)
@@ -165,7 +173,7 @@ emmeans3 <- emmeans(model33, ~ nozzle * solution, cont="pairwise", type = "respo
 dv90_main <- pairs(emmeans(model33, ~ nozzle * solution))
 
 describe_posterior(dv90_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model33)
@@ -209,7 +217,7 @@ emmeans4 <- emmeans(model43, ~ nozzle * solution, cont= "pairwise", type = "resp
 rs_main <- pairs(emmeans(model43, ~ nozzle * solution))
 
 describe_posterior(rs_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model43)
@@ -250,7 +258,7 @@ emmeans5 <- emmeans(model53, ~ nozzle * solution, cont= "pairwise", type = "resp
 duz_main <- pairs(emmeans(model53, ~ nozzle * solution))
 
 describe_posterior(duz_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model53)

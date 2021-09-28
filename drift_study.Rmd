@@ -75,7 +75,7 @@ epred <- emmeans(model1, "trt", dpar = "mean", cont="pairwise")
 inswath_main <- pairs(emmeans(model1, ~ trt))
 
 describe_posterior(inswath_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = model1)
@@ -324,6 +324,14 @@ id_df1 <- data_dw %>%
 ```
 
 ```{r}
+  df <- id_df1 %>% 
+    filter(id == 1)  
+  
+  audps(df$deposition, df$distance_m, type="absolute") 
+```
+
+
+```{r}
 auc_cal <- function(number){
   df <- id_df1 %>% 
     filter(id == number)  
@@ -358,7 +366,7 @@ brm(auc ~  trt + (1|block/location),
 ```
 
 ```{r}
-epred3 <- emmeans(auc_model, "trt", dpar = "mean", cont="pairwise")
+epred3 <- emmeans(auc_model, "trt", epred = TRUE, cont="pairwise")
 ```
 
 
@@ -366,7 +374,7 @@ epred3 <- emmeans(auc_model, "trt", dpar = "mean", cont="pairwise")
 auc_main <- pairs(emmeans(auc_model, ~ trt))
 
 describe_posterior(auc_main,
-                   centrality = "mean", dispersion = TRUE,
+                   centrality = "median", dispersion = TRUE,
                    ci = .95, ci_method = "hdi",
                    test = c("bayesfactor"),
                    bf_prior = auc_model)
@@ -418,35 +426,5 @@ ggplot(aes(x = fct_reorder(trt, emmean), y = emmean,
 ggsave("figures/Figure 4.png", width = 5, height = 4)
 ```
 
-
-
-
-
-
-
-```{r}
-#estimate_contrasts(auc_model, test = "bf") -> auc_bf
-#auc_bf %>% 
-#  tibble() -> auc_bf
-#readr::write_csv(path = "../supp_file/data/auc_bf.csv", x = auc_bf)
-```
-
-
-
-```{r eval = FALSE}
-#library(modelbased)
-#estimate_contrasts(auc_model, test = "bf") %>% 
-#  kableExtra::kable()
-```
-
-
-
-```{r}
-#c + figE +
-#  plot_annotation(tag_levels = 'A') & 
-#  theme(plot.tag = element_text(size = 35, hjust = 0, vjust = 0)) -> figU
-
-#ggsave("Figure 3.png", width = 8, height = 4)
-```
 
 
